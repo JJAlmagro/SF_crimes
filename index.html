@@ -1,30 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <meta charset="utf-8">
+<html>
+<head>
+    <title>Easy example | CartoDB.js</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+    <style>
+        html, body, #map {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
 
-    <title>Assignment 4: San Francisco Crimes</title>
-    <link rel="stylesheet" href="crimes.css">
-  </head>
-  <body>
-  <div id="header">
-    <h1>Assignment 4: San Francisco Crimes</h1>
-      <h3>Jose Juan Almagro Armenteros, Joseph Blair & Juan Salamanca Viloria</h3>
-      
-  </div>
-  <div id="nav" >
-      <a href = "#introduction" class="myButton"> Introduction</a> 
-      <a href = "#instructions" class="myButton">Instructions</a>
-      <a href = "#discussion" class="myButton">Discussion</a> 
-      <a href = "#cont" class="myButton">Contribution</a> 
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+</head>
+<body>
+<h1>Assignment 4: San Francisco Crimes</h1>
+<h3>Jose Juan Almagro Armenteros, Joseph Blair & Juan Salamanca Viloria</h3>
+<div id="map"></div>
 
-  </div>
-  <div id="section">
+<!-- include cartodb.js library -->
+<script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
 
-  </div>
+<script>
+    function main() {
+        cartodb.createVis('map', 'https://jjalmagro.cartodb.com/api/v2/viz/c08fb526-9e8a-11e5-926a-0ecd1babdde5/viz.json', {
+                    shareable: true,
+                    title: true,
+                    description: true,
+                    search: true,
+                    tiles_loader: true,
+                    center_lat: 37.766667,
+                    center_lon: -122.433333,
+                    zoom: 12
+                })
+                .done(function(vis, layers) {
+                    // layer 0 is the base layer, layer 1 is cartodb layer
+                    // setInteraction is disabled by default
+                    layers[1].setInteraction(true);
+                    layers[1].on('featureClick', function(e, latlng, pos, data) {
+                        cartodb.log.log(data);
 
-
-  </body>
-
+                    });
+                    // you can get the native map to work with it
+                    var map = vis.getNativeMap();
+                    // now, perform any operations you need
+                    // map.setZoom(3);
+                    // map.panTo([50.5, 30.5]);
+                })
+                .error(function(err) {
+                    console.log(err);
+                });
+    }
+    window.onload = main;
+    var sql = new cartodb.SQL({ user: 'jjalmagro' });
+    sql.execute("SELECT * FROM population_merge_1")
+            .done(function(data) {
+                console.log(data.rows);
+            })
+            .error(function(errors) {
+                // errors contains a list of errors
+                console.log("errors:" + errors);
+            })
+</script>
+</body>
 </html>
