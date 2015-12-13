@@ -119,7 +119,6 @@ function categories (chart, data, ii, subLayer, trans) {
 
     var keys = d3.keys(hist);
     var dist = hist["var2"];
-    console.log(dist);
     var keyX = ["the_geom", "cartodb_id", "field_1", "var2", "the_geom_webmercator"] ;
 
     for (var i = keyX.length - 1; i >= 0; i--) {
@@ -161,7 +160,6 @@ function categories (chart, data, ii, subLayer, trans) {
         .ticks(10);
 
     if (trans == "trans") {
-        console.log(dataT);
         d3.selectAll(".bars")
             .on("click", function () {
                 var sql = new cartodb.SQL({ user: 'jjalmagro' });
@@ -231,7 +229,6 @@ function categories (chart, data, ii, subLayer, trans) {
             {
                 var categor = categor.replace('_',' ');
             }
-            console.log(dist);
             var query = "select * from sf_crime where category = '" + categor + "' AND pddistrict = '" + dist + "'";
             console.log(query);
             // change the query in the layer to update the map
@@ -319,7 +316,7 @@ function year_plot(svg, data,index, trans){
         .y(function(d) { return y(d); })
         .interpolate("basis");
 
-    console.log(valueline(values))
+    console.log(values)
     if (trans == "trans") {
         d3.selectAll(".line1")
             .transition()
@@ -352,8 +349,12 @@ function year_plot(svg, data,index, trans){
             .attr("class", "xlabel")
             .attr("x", width - 40)
             .attr("y", height - 6)
+            .attr("id", function(d, i) { return i} )
             .style("text-anchor", "end")
             .text("Years")
+            .on("click", function(d){
+                console.log(this.id)
+            });
 
     // Add the Y Axis
     svg.append("g")
@@ -369,7 +370,30 @@ function year_plot(svg, data,index, trans){
 
     }
 }
-
+function createSelector(layer, layer1, layer2) {
+    var sql = new cartodb.SQL({ user: 'jjalmagro' });
+    var $options = $('#layer_selector li');
+    $options.click(function(e) {
+        layer1.hide();
+        layer2.hide();
+        layer.show();
+        // get the area of the selected layer
+        var $li = $(e.target);
+        var area = $li.attr('data');
+        // deselect all and select the clicked one
+        $options.removeClass('selected');
+        $li.addClass('selected');
+        // create query based on data from the layer
+        query = "SELECT * FROM aperrest_merge WHERE year = " + area;
+        // change the query in the layer to update the map
+        layer.setSQL(query);
+        if( area == 'clear') {
+            layer.toggle();
+            layer1.toggle();
+            layer2.toggle();
+        }
+    });
+}
 function main() {
     var margin = {top: 30, right: 20, bottom: 30, left: 100},
         width = 750 - margin.left - margin.right,
@@ -401,7 +425,7 @@ function main() {
         .append("g")
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
-    cartodb.createVis('map', 'https://jjalmagro.cartodb.com/api/v2/viz/b2aadd9e-a0df-11e5-ba3e-0ecd1babdde5/viz.json', {
+    cartodb.createVis('map', 'https://jjalmagro.cartodb.com/api/v2/viz/e495ae0a-a1df-11e5-8663-0ecfd53eb7d3/viz.json', {
             tiles_loader: true,
             center_lat: 37.766667,
             center_lon: -122.433333,
@@ -410,6 +434,11 @@ function main() {
         .done(function(vis, layers) {
             // layer 0 is the base layer, layer 1 is cartodb layer
             var subLayer = layers[1].getSubLayer(1);
+            var subLayer3 = layers[1].getSubLayer(0);
+            var subLayer2 = layers[1].getSubLayer(2);
+            subLayer2.toggle();
+            createSelector(subLayer2, subLayer3, subLayer);
+
             var sql = new cartodb.SQL({ user: 'juansv23' });
             sql.execute("SELECT * FROM timeline3")
                 .done(function(data) {

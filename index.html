@@ -33,17 +33,41 @@
             width:80%;
             float:left;
             padding:10px;
-            margin-left: 10%;
-            margin-right: 15%;
+            margin-left: 12%;
+            margin-right: 5%;
             background-color: white;
             text-align: justify;
 
         }
+        #layer_selector {
+            top: 700px;
+            left: 170px;
+            padding: 0;
+        }
+        #layer_selector ul {
+            padding: 0; margin: 0;
+            list-style-type: none;
+        }
+        #layer_selector li {
+            border-bottom: 1px solid #999;
+            padding: 15px 30px;
+            font-family: "Helvetica", Arial;
+            font-size: 13px;
+            color: #444;
+            cursor: auto;
+        }
+        #layer_selector li:hover {
+            background-color: #F0F0F0;
+            cursor: pointer;
+        }
+        #layer_selector li.selected {
+            background-color: #EEE;
+        }
         html, body {
-            width: 100%;
             height: 100%;
             padding: 0;
             margin: 0;
+            max-width: 1850px;
         }
         #map {
             height: 600px;
@@ -120,8 +144,14 @@
         #map, #year {
             float: left;
         }
+        #layer_selector, #map {
+            float: left;
+        }
         .selected {
             fill: orange;
+        }
+        #results {
+            margin-top: 1200px;
         }
     </style>
 </head>
@@ -133,18 +163,32 @@
 <div id="nav" >
     <a href = "#introduction" class="myButton">Introduction</a>
     <a href = "#instructions" class="myButton">Instructions</a>
-    <a href = "#discoveries" class="myButton">Discussion</a>
+    <a href = "#discoveries" class="myButton">Discoveries</a>
 
 </div>
 <div id="section">
     <div id="introduction">
     <h2>Introduction</h2>
         <p>
+            The main dataset used for the visualisation comes from SF Open Data, the central clearinghouse for data published by the City and County of San Francisco. This dataset contains information about the type of crime, where and when it was committed, and the police district the crime was committed in.
+
+            In addition to this data set, geographical coordinates of the police district were added, as well as the population sizes for each of the police districts. This was used to plot the data onto a map.
+
+            This visualisation aims to identify the change in the percentage of crimes resulting in arrests per year, as well as identify hotspots for particular crimes at particular hours in each district.
+
+            For these visualisations we have used the whole dataset provided by Kaggle with over 800,000 entries, as well as a random subset of this for map visuals. This was parsed using R and SQL.
 
         </p>
     </div>
     <div id="instructions">
         <h2>Instructions</h2>
+        <p>
+            Clicking on each district of the map allows to you to visualise the total frequency of the crimes committed at each hour. It will also show the normalised percentage of arrests per year in that district.
+
+            You will also be able to view the frequency of crimes committed in that region. By clicking on each bar of the histogram, you can identify where these crimes were committed on the map. In order to view these changes, the "Crimes/Pop" tab on the left of the screen must be selected.
+
+            The buttons which can be found to the left of the map support switching of layers, showing a chloropleth for each year showing the percentage of crimes resulting in arrests.
+        </p>
     </div>
     <div id="discoveries">
         <h2>Data discoveries</h2>
@@ -155,7 +199,17 @@
         <div id="time">
             <h3 align="center">Crimes frequency per hour</h3>
         </div>
-
+        <div id="layer_selector" class="cartodb-infobox">
+            <ul>
+                <li data="clear" class="selected">Crimes/pop</li>
+                <li data="2010">2010</li>
+                <li data="2011">2011</li>
+                <li data="2012">2012</li>
+                <li data="2013">2013</li>
+                <li data="2014">2014</li>
+                <li data="2015">2015</li>
+            </ul>
+        </div>
         <div id="year">
             <h3 align="center">Normalized percentage of crimes resulting in arrest</h3>
         </div>
@@ -163,6 +217,30 @@
             <h3 align="center">Crimes frequency per crime category</h3>
         </div>
     </div>
+        <div id="results">
+            <p>
+
+                In a recent <a href="http://www.sfexaminer.com/sf-crime-rate-jumps-despite-fewer-arrests/">interview</a>
+                , a spokesman for the District Attorney’s Office claimed the number of arrests have been falling in San Francisco despite an increase in serious crimes being committed. We wanted to investigate the truth in this though visualising the data we had.
+
+                One graph above shows the normalised percentage of crimes resulting in arrests over a six year period. It is clear that in most of the districts there is a decrease in the number of arrests given the number of crimes. This either means that the number of crimes is increasing whilst the number of arrests stay constant,  or that the number of arrests are falling while the number of crimes stays the same, or indeed increases.
+
+                This is most prevalent in Richmond and Tenderloin which show the biggest decrease in arrests over the last 6 years. Contrary to this, Mission district appears to exhibit an increase in the number of arrests however this may be due to a general decrease in crime.
+
+                These findings supports the claims that the number of arrests are decreasing in San Francisco, so we can conclude that on average in San Francisco, the number of crimes resulting in arrest is decreasing.
+
+
+
+</p>
+
+                <p>Using the visualization we can reach many conclusions about the different districts. For example, by looking at the Southern district, we can see that it is more likely to be a victim of larceny or theft around 6 p.m. We have also seen that most of the crimes reached the lowest points between 4 and 5 a.m. and begin to grow and reached a peak at midday and around 7 p.m.
+
+                One conclusion that can be drawn is that a number of these crimes occurring in touristic parts of the city, appear to be earlier in the day (between 3pm and 7pm) and are mainly theft or drug related.
+
+                Other assumptions that can be made by just looking at the maps are the people that can be involved in a crime by looking at the percentage of races and gender. Perhaps is not fair to make this assumptions as the data regarding race and gender of the criminals is not available
+
+            </p>
+        </div>
     </div>
 <!-- include cartodb.js library -->
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
