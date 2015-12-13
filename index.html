@@ -76,31 +76,6 @@
             position:relative;
             top:1px;
         }
-        #layer_selector {
-            position: absolute;
-            top: 320px;
-            right: 300px;
-            padding: 0;
-        }
-        #layer_selector ul {
-            padding: 0; margin: 0;
-            list-style-type: none;
-        }
-        #layer_selector li {
-            border-bottom: 1px solid #999;
-            padding: 15px 30px;
-            font-family: "Helvetica", Arial;
-            font-size: 13px;
-            color: #444;
-            cursor: auto;
-        }
-        #layer_selector li:hover {
-            background-color: #F0F0F0;
-            cursor: pointer;
-        }
-        #layer_selector li.selected {
-            background-color: #EEE;
-        }
         path {
             stroke: steelblue;
             stroke-width: 2;
@@ -118,9 +93,13 @@
         }
         #time {
             width: 50em;
-            height: 25em;
+            height: 22em;
             margin-left:30px;
-            margin-top: 140px;
+        }
+        #year {
+            width: 50em;
+            height: 15em;
+            margin-left:30px;
         }
         #cat {
             margin-top: 80px;
@@ -128,7 +107,17 @@
             width: 90em;
             height: 30em;
         }
+        #info {
+            width: 800px;
+            border-size:1px;
+            border-style:solid;
+            border-color: lightgrey;
+            padding: 10px;
+        }
         #map, #time {
+            float: left;
+        }
+        #map, #year {
             float: left;
         }
         .selected {
@@ -165,6 +154,10 @@
         </div>
         <div id="time">
             <h3 align="center">Crimes frequency per hour</h3>
+        </div>
+
+        <div id="year">
+            <h3 align="center">Normalized percentage of crimes resulting in arrest</h3>
         </div>
         <div id="cat">
             <h3 align="center">Crimes frequency per crime category</h3>

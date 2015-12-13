@@ -44,7 +44,7 @@ function time_plot(svg, data, index, trans){
     var valueline = d3.svg.line()
         .x(function(d, index) { return (index)*(width/24) + 15; })
         .y(function(d) { return y(d); })
-        .interpolate("monotone");
+        .interpolate("basis");
 
     if (trans == "trans") {
         d3.selectAll(".line")
@@ -75,11 +75,25 @@ function time_plot(svg, data, index, trans){
         .attr("class", "x_axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
+        svg.append("text")
+            .attr("class", "xlabel")
+            .attr("x", width - 10)
+            .attr("y", height - 6)
+            .style("text-anchor", "end")
+            .text("Hours");
+
 
     // Add the Y Axis
     svg.append("g")
         .attr("class", "y_axis")
         .call(yAxis);
+        svg.append("text")
+            .attr("class", "ylabel")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 2)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Frequency");
         svg.append("text")
             .attr("class", "title")
             .attr("x", (width / 2))
@@ -252,6 +266,109 @@ function categories (chart, data, ii, subLayer, trans) {
 
     }
 }
+function year_plot(svg, data,index, trans){
+    var margin = {top: 30, right: 50, bottom: 30, left: 50},
+        width = 780 - margin.left - margin.right,
+        height = 270 - margin.top - margin.bottom;
+
+    var data1 = data.rows[index];
+
+    Object.size = function(obj) {
+        var size = 0, key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) size++;
+        }
+        return size;
+
+    };
+
+    var keys = d3.keys(data1)
+
+    var kx = [];
+    var data =[];
+
+    for (var i = Object.size(data1) - 1; i >= 0; i--) {
+        kx.push(keys[i].substring(1,5))
+        data.push(data1[keys[i]])
+
+    };
+
+
+
+
+    index1 = kx.splice(0,6).reverse();
+    values = data.splice(0,6).reverse();
+
+
+// Set the ranges
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], .1).domain(index1)
+// var x = d3.scale.linear().range([0,width]). domain([0,index1.length]);
+    var y = d3.scale.linear().range([height, 0]).domain([d3.min(values)-0.1, d3.max(values)]);
+
+// Define the axes
+    var xAxis = d3.svg.axis().scale(x)
+        .orient("bottom").ticks(6);
+
+    var yAxis = d3.svg.axis().scale(y)
+        .orient("left").ticks(5);
+
+// Define the line
+    var valueline = d3.svg.line()
+        .x(function(d, index) { return (index)*(width/6) + 38; })
+        .y(function(d) { return y(d); })
+        .interpolate("basis");
+
+    console.log(valueline(values))
+    if (trans == "trans") {
+        d3.selectAll(".line1")
+            .transition()
+            .duration(1250)
+            .attr("d", valueline(values));
+        d3.selectAll(".y2_axis")
+            .transition()
+            .duration(1250)
+            .call(yAxis);
+    } else {
+// Add the valueline path.
+    svg.append("path")
+        .attr("class", "line1")
+        .attr("d", valueline(values));
+
+    /*    // Add the scatterplot
+     svg.selectAll("dot")
+     .data(values)
+     .enter().append("circle")
+     .attr("r", 3.5)
+     .attr("cx", function(d, index) { return (index)*(width/6) + 38; })
+     .attr("cy", function(d) { return y(d); });*/
+
+    // Add the X Axis
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+        svg.append("text")
+            .attr("class", "xlabel")
+            .attr("x", width - 40)
+            .attr("y", height - 6)
+            .style("text-anchor", "end")
+            .text("Years")
+
+    // Add the Y Axis
+    svg.append("g")
+        .attr("class", "y2_axis")
+        .call(yAxis);
+        svg.append("text")
+            .attr("class", "ylabel")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 2)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Norm. arrest percentage");
+
+    }
+}
 
 function main() {
     var margin = {top: 30, right: 20, bottom: 30, left: 100},
@@ -260,6 +377,13 @@ function main() {
 
     // Adds the svg canvas
     var svg1 = d3.select("#time")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+    var svg3 = d3.select("#year")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
@@ -298,6 +422,12 @@ function main() {
                     categories(svg2, data4, 0, subLayer);
 
                 });
+            var sql2 = new cartodb.SQL({ user: 'jjalmagro' });
+            sql2.execute("SELECT * FROM arrest")
+                .done(function(data) {
+                    // console.log(data.rows[0]);
+                    year_plot(svg3, data, 0);
+                });
             layers[1].on('featureClick', function(e, latlng, pos, data2, layerNumber) {
                 sql.execute("SELECT * FROM timeline3")
                     .done(function(data) {
@@ -308,6 +438,11 @@ function main() {
                     .done(function(data4) {
                         categories(svg2, data4, data2.index-1, subLayer, "trans");
 
+                    });
+                sql2.execute("SELECT * FROM arrest")
+                    .done(function(data5) {
+                        // console.log(data.rows[0]);
+                        year_plot(svg3, data5, data2.index-1, "trans");
                     })
                     .error(function(errors) {
                         // errors contains a list of errors
